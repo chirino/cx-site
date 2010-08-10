@@ -1,0 +1,62 @@
+h2
+  | Markdown
+  a#md-markup-help.right-float.inplace{ :href => "/.md-cheatsheet" } syntax help
+  
+form#md-form{ :method => "post", :action => "/.mdwn" }
+  fieldset
+    textarea#md-source{ :name => "md", :rows => "20", :cols => "30", :style => "width: 100%", :placeholder => "Type something here" }
+    
+p= "&nbsp;"
+#results
+  h3
+    a#html-result-view.right-float.inplace{ :href => "javascript:;" } show source
+  #md-preview
+  
+:javascript
+
+  $("#md-source").focus();
+  var timeout;
+  var needs_update = '';
+
+  function updatePreview(cont) {
+    $.post($("#md-form").attr("action"), $("#md-form").serialize(), function(data, status) {
+      if(status == 'success') {
+        $("#md-preview").html(data);
+        $("#results").show();
+      }
+      cont();
+    });
+  }
+
+  function scheduleUpdate() {
+    if(needs_update == $("#md-source").val())
+      return;
+
+    needs_update = $("#md-source").val();
+    clearTimeout(timeout);
+    timeout = setTimeout(function () {
+      clearTimeout(timeout);
+      updatePreview(function () {
+        if (needs_update != $("#md-source").val() && !timeout)
+          scheduleUpdate();
+      });
+    }, 500)
+  }
+
+  $("#md-source").keyup(function(){
+    if ($("#md-source").val().trim() != "") scheduleUpdate();
+    else $("#results").hide();
+  });
+
+  $("#html-result-view").click(function() {
+    $.fn.colorbox({html:'<pre><code>' + $('<div/>').text($("#md-preview").html()).html() + '</code></pre>'});
+  });
+
+  $("#md-markup-help").click(function() {
+    $.get($(this).attr('href'), function(data) {
+      $.fn.colorbox({html: '<div id="md-markup-help-contents">' + data + "</div>"});
+    });
+    return false;
+  });
+
+  $("#results").hide();

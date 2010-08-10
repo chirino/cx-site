@@ -1,0 +1,90 @@
+-@ var body: String
+-@ var ciripage: ru.ciridiri.Page = null
+-@ var toc: ru.circumflex.site.TOC = null
+-@ var sitemap: ru.ciridiri.Page = null
+-@ var host: String = null
+-@ var currentYear: String = null
+html
+  head
+    meta{ :content => "text/html; charset=utf-8", "http-equiv" => "content-type" }
+    
+    link{ :href => "/css/base.css", :rel => "stylesheet", :media => "screen, projection" }
+    link{ :href => "/css/colorbox.css", :rel => "stylesheet", :media => "screen, projection" }
+    link{ :href => "/css/print.css", :rel => "stylesheet", :media => "print" }
+    link{ :href => "/favicon.ico", :rel => "shortcut icon", :type => "image/x-icon" }
+    link{ :href => "/favicon.ico", :rel => "icon", :type => "image/x-icon" }
+    
+    script{ :src => "http://www.google-analytics.com/ga.js", :type => "text/javascript" }
+    script{ :src => "/js/application.js" }
+    script{ :src => "/js/highlight.pack.js" }
+    script{ :src => "/js/jquery-1.4.2.min.js" }
+    script{ :src => "/js/jquery.colorbox-min.js" }
+    
+    :javascript
+      // syntax highlighting
+      hljs.initHighlightingOnLoad();
+      // other stuff
+      $(document).ready(function(){
+        // smooth scrolling
+        $('a[href*=#]').click(function() {
+          var $target = $(this.hash);
+          $target = $target.length && $target || $('[name=' + this.hash.slice(1) +']');
+          if ($target.length) {
+            var $elem = this.hash.slice(1);
+            var $loc = document.location.href.replace(/#.*$/, "") + "#" + $elem;
+            var targetOffset = $target.offset().top;
+            $('html,body').animate({scrollTop: targetOffset}, 750,
+                    function() {document.location.href = $loc;});
+            return false;
+          }
+        });
+        // show/hide TOC
+        $('#toc-show').click(function() {
+          $('#toc-show').fadeOut(200, function(){$('#toc').fadeIn(400);});
+        });
+        $('#toc-hide').click(function() {
+          $('#toc').fadeOut(400, function(){$('#toc-show').fadeIn(200);});
+        });
+      });
+      
+    - if( ciripage!=null && currentTemplate.endsWith("/page.jade") )
+      link#edit-link(href="#{ciripage.uri}.html.e" title="Edit this page" rel="alternate" type="application/x-wiki")
+      
+    title
+      - if( ciripage!=null && ciripage.title != "" )
+        | #{ciripage.title}
+      - else 
+        | ciridiri: dead simple wiki engine
+  body
+  
+    #header
+      h1
+        a{ :href => "/", :title => "Home" } Circumflex
+        
+    - if( toc!=null && toc.toHtml != "" )
+      a#toc-show.toc{ :href => "javascript:;", :title => "Show Table of Contents" }
+        | table of contents &raquo;
+      #toc.toc{ :style => "display:none" }
+        a#toc-hide.right-float{ :href => "javascript:;", :title => "Hide Table of Contents" } &times;
+        !~~ toc.toHtml
+    #outer
+      - if( ciripage!=null )
+        #nav.bar
+          .green
+            .w
+              .e
+                .c
+                  !~~ sitemap.toHtml
+      #scraps
+      #page
+        !~~ body
+      #footer
+        span.years 
+          | 2009-#{currentYear}
+          a.home(href="http://#{host}") #{host}
+    :javascript
+      try {
+        var pageTracker = _gat._getTracker("UA-12034468-1");
+        pageTracker._setDomainName(".circumflex.ru");
+        pageTracker._trackPageview();
+      } catch(err) {}</script>

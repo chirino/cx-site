@@ -25,7 +25,7 @@
   </error-page>
   <error-page>
     <error-code>500</error-code>
-    <location>/error/500.html</location>
+    <location>/WEB-INF/scalate/errors/500.scaml</location>
   </error-page>
 
 </web-app>

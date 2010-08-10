@@ -1,25 +1,26 @@
 package ru.circumflex.site
 
 import ru.circumflex.core._
-import ru.circumflex.freemarker.FTL._
 import ru.ciridiri.{Page, CiriDiri}
 import ru.circumflex.md.Markdown
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.lang.StringBuilder
+import ru.circumflex.scalate.Scalate._
+
 
 class MainRouter extends RequestRouter {
 
   'host := header.getOrElse("Host", "")
   'currentYear := new SimpleDateFormat("yyyy").format(new Date)
-  'sitemap := Page.findByUri("/sitemap")    // read sitemap
+  'sitemap := Page.findByUri("/sitemap").get
 
   new CiriDiri {    // let ciridiri handle the rest
     override def onFound(page: Page) = "toc" := new TOC(page.toHtml)
   }
 
   // Markdown Live
-  get("/.mdwn") = ftl("/mdwn.ftl")
+  get("/.mdwn") = render("/WEB-INF/mdwn.jade")
   post("/.mdwn") = Markdown(param('md))
   get("/.md-cheatsheet") =
       if (isXhr)
